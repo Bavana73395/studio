@@ -15,7 +15,6 @@ export default function Home() {
   const { toast } = useToast();
 
   const [userLocation, setUserLocation] = React.useState<{ latitude: number; longitude: number } | null>(null);
-  const [category, setCategory] = React.useState<LocationCategory>('restaurant');
   const [useRatingFilter, setUseRatingFilter] = React.useState(false);
 
   const [searchResults, setSearchResults] = React.useState<LocationSearchResult[] | null>(null);
@@ -24,8 +23,10 @@ export default function Home() {
 
   const [isSearching, setIsSearching] = React.useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = React.useState(false);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
+    setIsClient(true);
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -56,6 +57,15 @@ export default function Home() {
   }, [toast]);
 
   const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Empty search query",
+        description: "Please enter something to search for.",
+      });
+      return;
+    }
+    
     setIsSearching(true);
     setSearchResults(null);
     setSelectedLocation(null);
@@ -63,7 +73,7 @@ export default function Home() {
     
     let finalQuery = query;
     if (useRatingFilter) {
-      finalQuery += " with a rating of 4.5 stars or higher";
+      finalQuery += " with a rating of 4 stars or higher";
     }
 
     try {
@@ -74,7 +84,7 @@ export default function Home() {
       });
 
       if (result.locations && result.locations.length > 0) {
-        setSearchResults(result.locations.map(name => ({ name, category })));
+        setSearchResults(result.locations);
       } else {
         setSearchResults([]);
       }
@@ -103,7 +113,7 @@ export default function Home() {
     generateDetailedDescription({
       locationName: location.name,
       locationType: location.category,
-      locationAddress: '',
+      locationAddress: location.address,
     })
       .then(result => {
         setDetailedDescription(result.detailedDescription);
@@ -122,6 +132,10 @@ export default function Home() {
       });
   };
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <main className="flex h-screen bg-background text-foreground overflow-hidden">
       <div className="w-full max-w-sm lg:max-w-md xl:max-w-lg flex flex-col border-r border-border">
@@ -133,8 +147,6 @@ export default function Home() {
         <SearchPanel
           onSearch={handleSearch}
           isSearching={isSearching}
-          category={category}
-          setCategory={setCategory}
           useRatingFilter={useRatingFilter}
           setUseRatingFilter={setUseRatingFilter}
         />

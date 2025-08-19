@@ -1,6 +1,8 @@
-export type LocationCategory = 'restaurant' | 'hotel' | 'hospital';
+export type LocationCategory = string;
 
 export interface LocationSearchResult {
   name: string;
   category: LocationCategory;
+  address: string;
+  imageUrl: string;
 }

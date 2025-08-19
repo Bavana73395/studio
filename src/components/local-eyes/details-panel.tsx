@@ -4,7 +4,7 @@ import type { LocationSearchResult } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { MapPin, Globe } from "lucide-react";
 import { LocationIcon } from "./location-icon";
 
 interface DetailsPanelProps {
@@ -29,7 +29,7 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
       <Card className="overflow-hidden">
         <div className="relative h-48 w-full">
             <Image
-                src={`https://placehold.co/600x400.png`}
+                src={location.imageUrl}
                 alt={`Image of ${location.name}`}
                 layout="fill"
                 objectFit="cover"
@@ -46,7 +46,14 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
             </div>
         </div>
         <CardContent className="p-6">
-          <h3 className="font-semibold text-lg mb-4">AI-Generated Details</h3>
+          <div className="flex items-start gap-4 mb-4">
+            <MapPin className="h-5 w-5 mt-1 text-muted-foreground" />
+            <div>
+              <h3 className="font-semibold">Address</h3>
+              <p className="text-muted-foreground">{location.address}</p>
+            </div>
+          </div>
+          <h3 className="font-semibold text-lg mb-2">AI-Generated Details</h3>
           {isLoading && (
             <div className="space-y-3">
               <Skeleton className="h-4 w-full" />

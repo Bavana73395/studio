@@ -24,9 +24,9 @@ export function ResultCard({ location, onSelect, isSelected }: ResultCardProps) 
       <div className={cn("p-2 rounded-lg", isSelected ? 'bg-primary text-primary-foreground': 'bg-secondary text-secondary-foreground')}>
         <LocationIcon category={location.category} className="h-6 w-6" />
       </div>
-      <div className="flex-1">
-        <h3 className="font-semibold text-sm">{location.name}</h3>
-        <p className="text-xs text-muted-foreground capitalize">{location.category}</p>
+      <div className="flex-1 overflow-hidden">
+        <h3 className="font-semibold text-sm truncate">{location.name}</h3>
+        <p className="text-xs text-muted-foreground capitalize truncate">{location.address}</p>
       </div>
     </Card>
   );

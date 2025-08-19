@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import type {LocationSearchResult} from '@/lib/types';
 
 const SearchLocationsInputSchema = z.object({
   query: z.string().describe('The user query for searching locations.'),
@@ -20,9 +21,16 @@ const SearchLocationsInputSchema = z.object({
 });
 export type SearchLocationsInput = z.infer<typeof SearchLocationsInputSchema>;
 
+const LocationSearchResultSchema = z.object({
+  name: z.string().describe('The name of the location.'),
+  category: z.string().describe('A category for the location (e.g., restaurant, park, museum).'),
+  address: z.string().describe('The full address of the location.'),
+  imageUrl: z.string().url().describe('A URL to an image of the location.'),
+});
+
 const SearchLocationsOutputSchema = z.object({
   locations: z
-    .array(z.string())
+    .array(LocationSearchResultSchema)
     .describe('A list of nearby locations matching the query.'),
 });
 export type SearchLocationsOutput = z.infer<typeof SearchLocationsOutputSchema>;
@@ -42,13 +50,21 @@ const prompt = ai.definePrompt({
   Language: {{{language}}}
 
   Provide a list of locations that match the user's query. The locations should be as specific as possible.
+  For each location, provide its name, a category, its full address, and a placeholder image URL from placehold.co.
   Ensure that the locations are near the user's current location.
   Consider the language of the user query when searching for locations.
   If the user location is not provided, use a general location based on the query.
 
   Example Output:
   {
-    "locations": ["Location 1", "Location 2", "Location 3"]
+    "locations": [
+      {
+        "name": "The Statue of Liberty",
+        "category": "Landmark",
+        "address": "New York, NY 10004, USA",
+        "imageUrl": "https://placehold.co/600x400.png"
+      }
+    ]
   }`,
 });
 
