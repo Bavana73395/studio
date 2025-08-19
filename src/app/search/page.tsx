@@ -163,7 +163,7 @@ export default function SearchPage() {
     <main className="flex h-screen bg-background text-foreground overflow-hidden">
       <div className="w-full max-w-sm lg:max-w-md xl:max-w-lg flex flex-col border-r border-border">
         <header className="p-4">
-          <h1 className="text-2xl font-bold text-primary font-headline tracking-tight">LocalEyes AI</h1>
+          <h1 className="text-2xl font-bold text-primary font-headline tracking-tight">LocaFind</h1>
           <p className="text-muted-foreground">Your AI-powered local search assistant.</p>
         </header>
         <Separator />

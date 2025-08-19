@@ -3,15 +3,15 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { MountainIcon } from 'lucide-react';
+import { LocateIcon } from 'lucide-react';
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
-          <MountainIcon className="h-6 w-6" />
-          <span className="sr-only">LocalEyes AI</span>
+          <LocateIcon className="h-6 w-6 text-primary" />
+          <span className="sr-only">LocaFind</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
@@ -33,7 +33,7 @@ export default function LandingPage() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Discover Your Next Favorite Spot with LocalEyes AI
+                    Discover Your Next Favorite Spot with LocaFind
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
                     Our intelligent search helps you find the best local spots, from restaurants and cafes to parks and
@@ -63,7 +63,7 @@ export default function LandingPage() {
         </section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 LocalEyes AI. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">&copy; 2024 LocaFind. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Terms of Service
