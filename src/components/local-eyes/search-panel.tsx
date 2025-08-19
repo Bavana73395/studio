@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -25,8 +26,14 @@ export function SearchPanel({ onSearch, isSearching, category, setCategory, useR
   const { toast } = useToast();
   
   const speechRecognitionRef = React.useRef<SpeechRecognition | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isClient) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       speechRecognitionRef.current = new SpeechRecognition();
@@ -48,7 +55,7 @@ export function SearchPanel({ onSearch, isSearching, category, setCategory, useR
       speechRecognitionRef.current.onstart = () => setIsListening(true);
       speechRecognitionRef.current.onend = () => setIsListening(false);
     }
-  }, [toast]);
+  }, [toast, isClient]);
 
   const handleCategoryClick = (newCategory: LocationCategory) => {
     setCategory(newCategory);
@@ -71,6 +78,10 @@ export function SearchPanel({ onSearch, isSearching, category, setCategory, useR
     }
   };
 
+  if (!isClient) {
+    return null;
+  }
+  
   return (
     <div className="p-4 space-y-4">
       <form
