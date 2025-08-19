@@ -4,8 +4,9 @@ import type { LocationSearchResult } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { MapPin, Globe } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { LocationIcon } from "./location-icon";
+import { Button } from "@/components/ui/button";
 
 interface DetailsPanelProps {
   location: LocationSearchResult | null;
@@ -23,6 +24,13 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
       </div>
     );
   }
+
+  const handleGetDirections = () => {
+    if (location) {
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location.address)}`;
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <div className="p-4 lg:p-6">
@@ -46,12 +54,18 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
             </div>
         </div>
         <CardContent className="p-6">
-          <div className="flex items-start gap-4 mb-4">
-            <MapPin className="h-5 w-5 mt-1 text-muted-foreground" />
-            <div>
-              <h3 className="font-semibold">Address</h3>
-              <p className="text-muted-foreground">{location.address}</p>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start gap-4">
+              <MapPin className="h-5 w-5 mt-1 text-muted-foreground" />
+              <div>
+                <h3 className="font-semibold">Address</h3>
+                <p className="text-muted-foreground">{location.address}</p>
+              </div>
             </div>
+            <Button variant="outline" size="sm" onClick={handleGetDirections}>
+              <Navigation className="mr-2 h-4 w-4" />
+              Get Directions
+            </Button>
           </div>
           <h3 className="font-semibold text-lg mb-2">AI-Generated Details</h3>
           {isLoading && (
