@@ -76,7 +76,7 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
             </div>
           )}
           {!isLoading && description && (
-            <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap font-body">
+            <div className="prose prose-sm max-w-none text-foreground/90 whitespace-pre-wrap font-body">
               {description}
             </div>
           )}
