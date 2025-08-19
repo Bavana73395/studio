@@ -88,12 +88,16 @@ export default function Home() {
       } else {
         setSearchResults([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Search failed:", error);
+      let description = "Could not fetch locations. Please try again.";
+      if (error.message && error.message.includes("503 Service Unavailable")) {
+        description = "The AI model is currently overloaded. Please try again in a few moments."
+      }
       toast({
         variant: "destructive",
         title: "Search failed",
-        description: "Could not fetch locations. Please try again.",
+        description: description,
       });
     } finally {
       setIsSearching(false);
