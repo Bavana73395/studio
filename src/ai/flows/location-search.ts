@@ -10,6 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import type {LocationSearchResult} from '@/lib/types';
+import {searchFoursquare} from '@/services/foursquare';
 
 const SearchLocationsInputSchema = z.object({
   query: z.string().describe('The user query for searching locations.'),
@@ -39,11 +40,30 @@ export async function searchLocations(input: SearchLocationsInput): Promise<Sear
   return searchLocationsFlow(input);
 }
 
+const foursquareTool = ai.defineTool(
+  {
+    name: 'searchFoursquare',
+    description: 'Search for locations using the Foursquare API.',
+    inputSchema: z.object({
+      query: z.string(),
+      ll: z.string().optional(),
+    }),
+    outputSchema: z.any(),
+  },
+  async (input) => {
+    return await searchFoursquare(input);
+  }
+);
+
+
 const prompt = ai.definePrompt({
   name: 'searchLocationsPrompt',
   input: {schema: SearchLocationsInputSchema},
   output: {schema: SearchLocationsOutputSchema},
+  tools: [foursquareTool],
   prompt: `You are a helpful assistant that provides a list of nearby locations based on the user's query.
+
+  Use the searchFoursquare tool to find locations.
 
   User Query: {{{query}}}
   User Location: {{{userLocation}}}

@@ -6,3 +6,4 @@ import '@/ai/flows/rating-filter.ts';
 import '@/ai/flows/voice-search.ts';
 import '@/ai/flows/multilingual-support.ts';
 import '@/ai/flows/detailed-description.ts';
+import '@/services/foursquare.ts';
