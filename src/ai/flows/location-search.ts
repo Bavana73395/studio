@@ -65,7 +65,7 @@ const prompt = ai.definePrompt({
   input: {schema: SearchLocationsInputSchema},
   output: {schema: SearchLocationsOutputSchema},
   tools: [foursquareTool],
-  prompt: `You are a helpful assistant that provides a list of nearby locations based on the user's query.
+  prompt: `You are a helpful assistant that provides a list of nearby, high-quality locations based on the user's query. Your goal is to find the best and most convenient options for the user.
 
   Use the searchFoursquare tool to find locations.
 
@@ -74,6 +74,7 @@ const prompt = ai.definePrompt({
   Language: {{{language}}}
 
   Provide a list of locations that match the user's query. The locations should be as specific as possible.
+  When interpreting the query, assume the user is looking for the best quality options available (e.g., top-rated, popular).
   For each location, provide its name, a category, its full address, its latitude and longitude, and a placeholder image URL from placehold.co.
   You MUST prioritize locations that are physically near the user's provided location. When the user's location is available, you MUST use a search radius of 5000 meters.
   Consider the language of the user query when searching for locations.
