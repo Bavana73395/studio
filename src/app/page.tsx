@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LocateIcon } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LandingPage() {
   return (
@@ -50,13 +51,13 @@ export default function LandingPage() {
                   </Link>
                 </div>
               </div>
-              <img
-                src="https://placehold.co/600x400.png"
+              <Image
+                src="/locafind-logo.png"
                 width="600"
                 height="400"
                 alt="Hero"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-                data-ai-hint="map city"
+                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
+                data-ai-hint="logo"
               />
             </div>
           </div>
