@@ -10,8 +10,25 @@ import type { LocationSearchResult } from "@/lib/types";
 import { SearchPanel } from "@/components/local-eyes/search-panel";
 import { ResultsList } from "@/components/local-eyes/results-list";
 import { DetailsPanel } from "@/components/local-eyes/details-panel";
-import { Separator } from "@/components/ui/separator";
-import { History } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetDescription,
+  SheetClose
+} from "@/components/ui/sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button";
+import { List } from "lucide-react";
 
 export default function SearchPage() {
   const { toast } = useToast();
@@ -29,6 +46,9 @@ export default function SearchPage() {
   const [isLoadingDetails, setIsLoadingDetails] = React.useState(false);
   const [isClient, setIsClient] = React.useState(false);
 
+  const [isResultsSheetOpen, setIsResultsSheetOpen] = React.useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+
   React.useEffect(() => {
     setIsClient(true);
     if (typeof window !== 'undefined') {
@@ -45,10 +65,6 @@ export default function SearchPage() {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
-          toast({
-            title: "Location detected",
-            description: "Ready to find places near you.",
-          });
         },
         () => {
           toast({
@@ -58,12 +74,6 @@ export default function SearchPage() {
           });
         }
       );
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Geolocation not supported",
-        description: "Your browser does not support geolocation.",
-      });
     }
   }, [toast]);
   
@@ -74,19 +84,13 @@ export default function SearchPage() {
   };
 
   const handleSearch = async (query: string) => {
-    if (!query.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Empty search query",
-        description: "Please enter something to search for.",
-      });
-      return;
-    }
+    if (!query.trim()) return;
     
     setIsSearching(true);
     setSearchResults(null);
     setSelectedLocation(null);
     setDetailedDescription(null);
+    setIsResultsSheetOpen(true);
     
     updateSearchHistory(query);
     
@@ -102,11 +106,7 @@ export default function SearchPage() {
         language: navigator.language,
       });
 
-      if (result.locations && result.locations.length > 0) {
-        setSearchResults(result.locations);
-      } else {
-        setSearchResults([]);
-      }
+      setSearchResults(result.locations ?? []);
     } catch (error: any) {
       console.error("Search failed:", error);
       let description = "Could not fetch locations. Please try again.";
@@ -118,41 +118,36 @@ export default function SearchPage() {
         title: "Search failed",
         description: description,
       });
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
   
-  const handleSelectLocation = (location: LocationSearchResult) => {
-    if (selectedLocation?.name === location.name) {
-      setSelectedLocation(null);
-      setDetailedDescription(null);
-      return;
-    }
+  const handleSelectLocation = async (location: LocationSearchResult) => {
     setSelectedLocation(location);
+    setIsDetailsDialogOpen(true);
     setDetailedDescription(null);
     setIsLoadingDetails(true);
 
-    generateDetailedDescription({
-      locationName: location.name,
-      locationType: location.category,
-      locationAddress: location.address,
-    })
-      .then(result => {
-        setDetailedDescription(result.detailedDescription);
-      })
-      .catch(error => {
-        console.error("Failed to get details:", error);
-        toast({
-          variant: "destructive",
-          title: "Could not load details",
-          description: "Failed to get detailed information. Please try again.",
-        });
-        setDetailedDescription("Sorry, we couldn't load the details for this location.");
-      })
-      .finally(() => {
-        setIsLoadingDetails(false);
+    try {
+      const result = await generateDetailedDescription({
+        locationName: location.name,
+        locationType: location.category,
+        locationAddress: location.address,
       });
+      setDetailedDescription(result.detailedDescription);
+    } catch (error) {
+      console.error("Failed to get details:", error);
+      toast({
+        variant: "destructive",
+        title: "Could not load details",
+        description: "Failed to get detailed information. Please try again.",
+      });
+      setDetailedDescription("Sorry, we couldn't load the details for this location.");
+    } finally {
+      setIsLoadingDetails(false);
+    }
   };
 
   if (!isClient) {
@@ -160,54 +155,56 @@ export default function SearchPage() {
   }
 
   return (
-    <main className="flex h-screen bg-background text-foreground overflow-hidden">
-      <div className="w-full max-w-sm lg:max-w-md xl:max-w-lg flex flex-col border-r border-border">
-        <header className="p-4">
-          <h1 className="text-2xl font-bold text-primary font-headline tracking-tight">LocaFind</h1>
-          <p className="text-muted-foreground">Your AI-powered local search assistant.</p>
-        </header>
-        <Separator />
-        <SearchPanel
-          onSearch={handleSearch}
-          isSearching={isSearching}
-          useRatingFilter={useRatingFilter}
-          setUseRatingFilter={setUseRatingFilter}
-        />
-        <Separator />
-        {searchHistory.length > 0 && (
-          <div className="p-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                <History className="h-4 w-4" />
-                Recent Searches
+    <main className="h-screen w-screen flex flex-col bg-background text-foreground overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 z-10 p-4">
+            <SearchPanel
+              onSearch={handleSearch}
+              isSearching={isSearching}
+              useRatingFilter={useRatingFilter}
+              setUseRatingFilter={setUseRatingFilter}
+            />
+        </div>
+
+        <div className="flex-1 h-full w-full bg-cover bg-center" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}} data-ai-hint="city street map">
+        </div>
+        
+        {searchResults && (
+            <div className="absolute bottom-4 right-4 z-10">
+                <Sheet open={isResultsSheetOpen} onOpenChange={setIsResultsSheetOpen}>
+                  <SheetTrigger asChild>
+                    <Button size="lg" className="rounded-full shadow-lg">
+                        <List className="mr-2" />
+                        Show Results
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom">
+                    <SheetHeader>
+                      <SheetTitle>Search Results</SheetTitle>
+                       <SheetDescription>
+                        Showing {searchResults.length} locations.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <ResultsList
+                      results={searchResults}
+                      isLoading={isSearching}
+                      onSelectLocation={handleSelectLocation}
+                      selectedLocation={selectedLocation}
+                    />
+                  </SheetContent>
+                </Sheet>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {searchHistory.map((query) => (
-                <button
-                  key={query}
-                  onClick={() => handleSearch(query)}
-                  className="px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-accent hover:text-accent-foreground transition-colors"
-                >
-                  {query}
-                </button>
-              ))}
-            </div>
-          </div>
         )}
-        <Separator />
-        <ResultsList
-          results={searchResults}
-          isLoading={isSearching}
-          onSelectLocation={handleSelectLocation}
-          selectedLocation={selectedLocation}
-        />
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        <DetailsPanel
-          location={selectedLocation}
-          description={detailedDescription}
-          isLoading={isLoadingDetails}
-        />
-      </div>
+
+        <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+          <DialogContent className="sm:max-w-[625px]">
+              <DetailsPanel
+                location={selectedLocation}
+                description={detailedDescription}
+                isLoading={isLoadingDetails}
+              />
+          </DialogContent>
+        </Dialog>
+
     </main>
   );
 }

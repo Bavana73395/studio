@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { LocationSearchResult } from "@/lib/types";
@@ -15,12 +16,21 @@ interface DetailsPanelProps {
 }
 
 export function DetailsPanel({ location, description, isLoading }: DetailsPanelProps) {
-  if (!location) {
+  if (isLoading || !location) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
-        <MapPin className="h-16 w-16 mb-4" />
-        <h2 className="text-xl font-semibold">Select a location</h2>
-        <p>Choose a location from the list to see its details.</p>
+      <div className="p-4 lg:p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+          <div className="space-y-3">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-4/5" />
+            </div>
+        </div>
       </div>
     );
   }
@@ -33,18 +43,17 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
   };
 
   return (
-    <div className="p-4 lg:p-6">
-      <Card className="overflow-hidden">
+    <div className="p-1">
         <div className="relative h-48 w-full">
             <Image
                 src={location.imageUrl}
                 alt={`Image of ${location.name}`}
-                layout="fill"
+                fill
                 objectFit="cover"
-                className="transition-transform duration-300 hover:scale-105"
+                className="rounded-lg transition-transform duration-300 hover:scale-105"
                 data-ai-hint={`${location.category} building`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
             <div className="absolute bottom-0 left-0 p-4">
                 <div className="p-3 bg-primary/80 backdrop-blur-sm rounded-full inline-block mb-2">
                     <LocationIcon category={location.category} className="h-6 w-6 text-primary-foreground" />
@@ -53,18 +62,18 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
                 <p className="text-sm text-white/90 shadow-sm capitalize">{location.category}</p>
             </div>
         </div>
-        <CardContent className="p-6">
+        <div className="p-4">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-start gap-4">
-              <MapPin className="h-5 w-5 mt-1 text-muted-foreground" />
+              <MapPin className="h-5 w-5 mt-1 text-muted-foreground shrink-0" />
               <div>
                 <h3 className="font-semibold">Address</h3>
                 <p className="text-muted-foreground">{location.address}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleGetDirections}>
+            <Button variant="outline" size="sm" onClick={handleGetDirections} className="shrink-0">
               <Navigation className="mr-2 h-4 w-4" />
-              Get Directions
+              Directions
             </Button>
           </div>
           <h3 className="font-semibold text-lg mb-2">AI-Generated Details</h3>
@@ -80,8 +89,7 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
               {description}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
     </div>
   );
 }

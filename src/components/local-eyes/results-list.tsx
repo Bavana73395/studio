@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { LocationSearchResult } from "@/lib/types";
@@ -15,12 +16,12 @@ interface ResultsListProps {
 
 export function ResultsList({ results, isLoading, onSelectLocation, selectedLocation }: ResultsListProps) {
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="h-[40vh]">
       <div className="p-4 space-y-2">
         {isLoading &&
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center space-x-4 p-2">
-              <Skeleton className="h-10 w-10 rounded-lg" />
+              <Skeleton className="h-12 w-12 rounded-lg" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-[250px]" />
                 <Skeleton className="h-4 w-[200px]" />
