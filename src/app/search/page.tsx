@@ -16,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  SheetTrigger,
 } from "@/components/ui/sheet"
 import {
   Dialog,
@@ -166,9 +167,11 @@ export default function SearchPage() {
       });
     }
 
+    const hasSearchResults = searchResults && searchResults.length > 0;
+
     // Add a small buffer to the bounding box
-    const latBuffer = (maxLat - minLat) * 0.1 || 0.05;
-    const lonBuffer = (maxLon - minLon) * 0.1 || 0.05;
+    const latBuffer = hasSearchResults ? (maxLat - minLat) * 0.1 : 0.05;
+    const lonBuffer = hasSearchResults ? (maxLon - minLon) * 0.1 : 0.05;
 
     const bbox = `${minLon - lonBuffer},${minLat - latBuffer},${maxLon + lonBuffer},${maxLat + latBuffer}`;
     
