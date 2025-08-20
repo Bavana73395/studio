@@ -15,7 +15,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   SheetDescription,
   SheetClose
 } from "@/components/ui/sheet"
@@ -197,6 +196,9 @@ export default function SearchPage() {
 
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
           <DialogContent className="sm:max-w-[625px]">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Location Details</DialogTitle>
+            </DialogHeader>
               <DetailsPanel
                 location={selectedLocation}
                 description={detailedDescription}
