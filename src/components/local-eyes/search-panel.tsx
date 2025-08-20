@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Mic, Search, Star } from "lucide-react";
+import { Mic, Search, Star, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -14,17 +14,19 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface SearchPanelProps {
   onSearch: (query: string) => void;
+  onImageSearch: (file: File) => void;
   isSearching: boolean;
   useRatingFilter: boolean;
   setUseRatingFilter: (value: boolean) => void;
 }
 
-export function SearchPanel({ onSearch, isSearching, useRatingFilter, setUseRatingFilter }: SearchPanelProps) {
+export function SearchPanel({ onSearch, onImageSearch, isSearching, useRatingFilter, setUseRatingFilter }: SearchPanelProps) {
   const [query, setQuery] = React.useState("");
   const [isListening, setIsListening] = React.useState(false);
   const { toast } = useToast();
   
   const speechRecognitionRef = React.useRef<SpeechRecognition | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -48,7 +50,7 @@ export function SearchPanel({ onSearch, isSearching, useRatingFilter, setUseRati
       speechRecognitionRef.current.onstart = () => setIsListening(true);
       speechRecognitionRef.current.onend = () => setIsListening(false);
     }
-  }, [toast, onSearch]);
+  }, [toast]);
   
   const handleSearch = (searchQuery: string) => {
     onSearch(searchQuery);
@@ -66,6 +68,21 @@ export function SearchPanel({ onSearch, isSearching, useRatingFilter, setUseRati
     setQuery(term);
     handleSearch(term);
   }
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onImageSearch(file);
+    }
+    // Reset file input
+    if(event.target) {
+        event.target.value = "";
+    }
+  };
   
   return (
       <Card className="p-2 shadow-xl rounded-2xl">
@@ -81,12 +98,22 @@ export function SearchPanel({ onSearch, isSearching, useRatingFilter, setUseRati
                     placeholder="Search for places..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="pl-10 pr-10 h-12 text-lg rounded-xl border-0 shadow-none focus-visible:ring-0"
+                    className="pl-10 pr-24 h-12 text-lg rounded-xl border-0 shadow-none focus-visible:ring-0"
                     disabled={isSearching}
+                />
+                 <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/*"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2">
                     <Button type="button" variant="ghost" size="icon" className="rounded-full" onClick={startVoiceSearch} disabled={isSearching || isListening}>
                         <Mic className={cn("h-5 w-5", isListening && "text-destructive animate-pulse")} />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="rounded-full" onClick={handleCameraClick} disabled={isSearching}>
+                        <Camera className="h-5 w-5" />
                     </Button>
                 </div>
             </div>

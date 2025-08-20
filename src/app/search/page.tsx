@@ -4,6 +4,7 @@
 import * as React from "react";
 import { searchLocations } from "@/ai/flows/location-search";
 import { generateDetailedDescription } from "@/ai/flows/detailed-description";
+import { imageToText } from "@/ai/flows/image-to-text";
 import { useToast } from "@/hooks/use-toast";
 import type { LocationSearchResult } from "@/lib/types";
 
@@ -147,6 +148,30 @@ export default function SearchPage() {
       setIsLoadingDetails(false);
     }
   };
+
+  const handleImageSearch = (file: File) => {
+    setIsSearching(true);
+    toast({ title: "Analyzing Image...", description: "Extracting text from the image." });
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const photoDataUri = e.target?.result as string;
+      try {
+        const result = await imageToText({ photoDataUri });
+        if (result.extractedText) {
+          toast({ title: "Text Extracted", description: "Performing search with the extracted text." });
+          handleSearch(result.extractedText);
+        } else {
+          toast({ variant: "destructive", title: "No text found", description: "Could not find any text in the image." });
+          setIsSearching(false);
+        }
+      } catch (error) {
+        console.error("Image to text failed:", error);
+        toast({ variant: "destructive", title: "Image analysis failed", description: "Could not extract text from the image." });
+        setIsSearching(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
   
     const generateMapUrl = () => {
     if (!userLocation) return "";
@@ -188,6 +213,7 @@ export default function SearchPage() {
         <div className="absolute top-0 left-0 right-0 z-10 p-4">
             <SearchPanel
               onSearch={handleSearch}
+              onImageSearch={handleImageSearch}
               isSearching={isSearching}
               useRatingFilter={useRatingFilter}
               setUseRatingFilter={setUseRatingFilter}
