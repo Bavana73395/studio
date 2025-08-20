@@ -27,7 +27,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
-import { List } from "lucide-react";
+import { List, MapIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
   const { toast } = useToast();
@@ -163,8 +164,26 @@ export default function SearchPage() {
               setUseRatingFilter={setUseRatingFilter}
             />
         </div>
-
-        <div className="flex-1 h-full w-full bg-cover bg-center" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}} data-ai-hint="city street map">
+        
+        <div className="flex-1 h-full w-full bg-muted">
+          {userLocation ? (
+             <iframe
+              title="Current Location Map"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${userLocation.longitude-0.1},${userLocation.latitude-0.1},${userLocation.longitude+0.1},${userLocation.latitude+0.1}&layer=mapnik&marker=${userLocation.latitude},${userLocation.longitude}`}
+            ></iframe>
+          ) : (
+            <div className="h-full w-full flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                    <MapIcon className="mx-auto h-12 w-12" />
+                    <p className="mt-2">Getting your location...</p>
+                </div>
+            </div>
+          )}
         </div>
         
         {searchResults && (
@@ -197,7 +216,12 @@ export default function SearchPage() {
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
           <DialogContent className="sm:max-w-[625px]">
             <DialogHeader>
-              <DialogTitle className="sr-only">Location Details</DialogTitle>
+              <DialogTitle>
+                {selectedLocation ? selectedLocation.name : "Location Details"}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                  Details for {selectedLocation?.name}.
+              </DialogDescription>
             </DialogHeader>
               <DetailsPanel
                 location={selectedLocation}
