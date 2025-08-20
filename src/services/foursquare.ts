@@ -27,7 +27,7 @@ export async function searchFoursquare(params: FoursquareSearchParams) {
 
   const searchParams = new URLSearchParams({
     query: params.query,
-    limit: (params.limit || 10).toString(),
+    limit: (params.limit || 20).toString(),
     ...params.ll && {ll: params.ll},
     ...params.radius && {radius: params.radius.toString()},
   });
