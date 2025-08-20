@@ -75,7 +75,7 @@ const prompt = ai.definePrompt({
 
   Provide a list of locations that match the user's query. The locations should be as specific as possible.
   For each location, provide its name, a category, its full address, its latitude and longitude, and a placeholder image URL from placehold.co.
-  You MUST prioritize locations that are physically near the user's provided location. When the user's location is available, use a search radius of 5000 meters.
+  You MUST prioritize locations that are physically near the user's provided location. When the user's location is available, you MUST use a search radius of 5000 meters.
   Consider the language of the user query when searching for locations.
   If the user location is not provided, use a general location based on the query.
 
