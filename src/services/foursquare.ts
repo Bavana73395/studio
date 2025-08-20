@@ -51,7 +51,9 @@ export async function searchFoursquare(params: FoursquareSearchParams) {
         name: place.name,
         category: place.categories[0]?.name || 'uncategorized',
         address: place.location.formatted_address,
-        imageUrl: `https://placehold.co/600x400.png`
+        imageUrl: `https://placehold.co/600x400.png`,
+        lat: place.geocodes.main.latitude,
+        lng: place.geocodes.main.longitude,
     }));
 
     return { locations };

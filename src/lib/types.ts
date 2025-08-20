@@ -5,4 +5,6 @@ export interface LocationSearchResult {
   category: LocationCategory;
   address: string;
   imageUrl: string;
+  lat?: number;
+  lng?: number;
 }

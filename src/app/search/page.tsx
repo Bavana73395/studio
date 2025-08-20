@@ -16,7 +16,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  SheetClose
 } from "@/components/ui/sheet"
 import {
   Dialog,
@@ -24,11 +23,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { List, MapIcon } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
   const { toast } = useToast();
@@ -149,6 +146,35 @@ export default function SearchPage() {
       setIsLoadingDetails(false);
     }
   };
+  
+    const generateMapUrl = () => {
+    if (!userLocation) return "";
+
+    const { latitude, longitude } = userLocation;
+    let markers = `${latitude},${longitude}`;
+    let minLat = latitude, maxLat = latitude, minLon = longitude, maxLon = longitude;
+
+    if (searchResults && searchResults.length > 0) {
+      searchResults.forEach(loc => {
+        if (loc.lat && loc.lng) {
+          markers += `|${loc.lat},${loc.lng}`;
+          minLat = Math.min(minLat, loc.lat);
+          maxLat = Math.max(maxLat, loc.lat);
+          minLon = Math.min(minLon, loc.lng);
+          maxLon = Math.max(maxLon, loc.lng);
+        }
+      });
+    }
+
+    // Add a small buffer to the bounding box
+    const latBuffer = (maxLat - minLat) * 0.1 || 0.05;
+    const lonBuffer = (maxLon - minLon) * 0.1 || 0.05;
+
+    const bbox = `${minLon - lonBuffer},${minLat - latBuffer},${maxLon + lonBuffer},${maxLat + latBuffer}`;
+    
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${markers}`;
+  };
+
 
   if (!isClient) {
     return null;
@@ -174,7 +200,7 @@ export default function SearchPage() {
               style={{ border: 0 }}
               loading="lazy"
               allowFullScreen
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${userLocation.longitude-0.1},${userLocation.latitude-0.1},${userLocation.longitude+0.1},${userLocation.latitude+0.1}&layer=mapnik&marker=${userLocation.latitude},${userLocation.longitude}`}
+              src={generateMapUrl()}
             ></iframe>
           ) : (
             <div className="h-full w-full flex items-center justify-center">

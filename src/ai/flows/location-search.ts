@@ -28,6 +28,8 @@ const LocationSearchResultSchema = z.object({
   category: z.string().describe('A category for the location (e.g., restaurant, park, museum).'),
   address: z.string().describe('The full address of the location.'),
   imageUrl: z.string().url().describe('A URL to an image of the location.'),
+  lat: z.number().optional().describe('The latitude of the location.'),
+  lng: z.number().optional().describe('The longitude of the location.'),
 });
 
 const SearchLocationsOutputSchema = z.object({
@@ -72,7 +74,7 @@ const prompt = ai.definePrompt({
   Language: {{{language}}}
 
   Provide a list of locations that match the user's query. The locations should be as specific as possible.
-  For each location, provide its name, a category, its full address, and a placeholder image URL from placehold.co.
+  For each location, provide its name, a category, its full address, its latitude and longitude, and a placeholder image URL from placehold.co.
   You MUST prioritize locations that are physically near the user's provided location. When the user's location is available, use a search radius of 5000 meters.
   Consider the language of the user query when searching for locations.
   If the user location is not provided, use a general location based on the query.
@@ -84,7 +86,9 @@ const prompt = ai.definePrompt({
         "name": "The Statue of Liberty",
         "category": "Landmark",
         "address": "New York, NY 10004, USA",
-        "imageUrl": "https://placehold.co/600x400.png"
+        "imageUrl": "https://placehold.co/600x400.png",
+        "lat": 40.6892,
+        "lng": -74.0445
       }
     ]
   }`,
