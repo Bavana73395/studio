@@ -178,8 +178,8 @@ export default function SearchPage() {
 
     const { latitude, longitude } = userLocation;
     
-    // Default view shows only user's location
-    let markers = `${latitude},${longitude}`;
+    // Always include user's location marker
+    let markers = `|${latitude},${longitude}`; 
     let minLat = latitude, maxLat = latitude, minLon = longitude, maxLon = longitude;
 
     const hasSearchResults = searchResults && searchResults.length > 0;
@@ -196,18 +196,18 @@ export default function SearchPage() {
       });
     }
 
-    // Add a small buffer to the bounding box
-    const latBuffer = hasSearchResults ? (maxLat - minLat) * 0.1 : 0.05;
-    const lonBuffer = hasSearchResults ? (maxLon - minLon) * 0.1 : 0.05;
+    const url = `https://www.openstreetmap.org/export/embed.html?layer=mapnik&marker=${latitude},${longitude}${markers}`;
     
-    const bbox = `${minLon - lonBuffer},${minLat - latBuffer},${maxLon + lonBuffer},${maxLat + latBuffer}`;
-    
-    // If there are no search results, we don't need a bounding box.
-    const url = `https://www.openstreetmap.org/export/embed.html?layer=mapnik&marker=${markers}`;
+    // If there are search results, calculate a bounding box to fit all markers
     if (hasSearchResults) {
-        return `${url}&bbox=${bbox}`;
+      // Add a small buffer to the bounding box
+      const latBuffer = (maxLat - minLat) * 0.1 || 0.01;
+      const lonBuffer = (maxLon - minLon) * 0.1 || 0.01;
+      const bbox = `${minLon - lonBuffer},${minLat - latBuffer},${maxLon + lonBuffer},${maxLat + latBuffer}`;
+      return `${url}&bbox=${bbox}`;
     }
     
+    // If no results, just center on the user's location with a default zoom level
     return url;
   };
 
