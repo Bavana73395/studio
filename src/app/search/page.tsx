@@ -22,9 +22,9 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { List, MapIcon } from "lucide-react";
@@ -173,14 +173,18 @@ export default function SearchPage() {
     reader.readAsDataURL(file);
   };
   
-    const generateMapUrl = () => {
+  const generateMapUrl = () => {
     if (!userLocation) return "";
 
     const { latitude, longitude } = userLocation;
+    
+    // Default view shows only user's location
     let markers = `${latitude},${longitude}`;
     let minLat = latitude, maxLat = latitude, minLon = longitude, maxLon = longitude;
 
-    if (searchResults && searchResults.length > 0) {
+    const hasSearchResults = searchResults && searchResults.length > 0;
+
+    if (hasSearchResults) {
       searchResults.forEach(loc => {
         if (loc.lat && loc.lng) {
           markers += `|${loc.lat},${loc.lng}`;
@@ -192,17 +196,20 @@ export default function SearchPage() {
       });
     }
 
-    const hasSearchResults = searchResults && searchResults.length > 0;
-
     // Add a small buffer to the bounding box
     const latBuffer = hasSearchResults ? (maxLat - minLat) * 0.1 : 0.05;
     const lonBuffer = hasSearchResults ? (maxLon - minLon) * 0.1 : 0.05;
-
+    
     const bbox = `${minLon - lonBuffer},${minLat - latBuffer},${maxLon + lonBuffer},${maxLat + latBuffer}`;
     
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${markers}`;
+    // If there are no search results, we don't need a bounding box.
+    const url = `https://www.openstreetmap.org/export/embed.html?layer=mapnik&marker=${markers}`;
+    if (hasSearchResults) {
+        return `${url}&bbox=${bbox}`;
+    }
+    
+    return url;
   };
-
 
   if (!isClient) {
     return null;
