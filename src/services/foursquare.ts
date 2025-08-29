@@ -58,7 +58,7 @@ export async function searchFoursquare(params: FoursquareSearchParams) {
         lng: place.geocodes.main.longitude,
         rating: place.rating,
         hours: place.hours?.display,
-        website: place.website
+        website: place.website || undefined
     }));
 
     return { locations };

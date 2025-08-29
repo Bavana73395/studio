@@ -32,7 +32,7 @@ const LocationSearchResultSchema = z.object({
   lng: z.number().optional().describe('The longitude of the location.'),
   rating: z.number().optional().describe('The rating of the location, from 0 to 10.'),
   hours: z.string().optional().describe('The hours of operation for the location (e.g., "Open", "Closed", "Open 24 hours").'),
-  website: z.string().optional().describe('The website of the location.'),
+  website: z.string().optional().nullable().describe('The website of the location.'),
 });
 
 const SearchLocationsOutputSchema = z.object({
@@ -113,3 +113,4 @@ const searchLocationsFlow = ai.defineFlow(
     return output!;
   }
 );
+
