@@ -1,78 +1,89 @@
 
 "use client";
 
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LocateIcon } from 'lucide-react';
-import Image from 'next/image';
+import { Input } from '@/components/ui/input';
+import { LocateIcon, Search, MapPin } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [query, setQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+  
+  const handleNearMe = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          router.push('/search?near_me=true');
+        },
+        () => {
+          toast({
+            variant: "destructive",
+            title: "Location access denied",
+            description: "Please enable location access to use the 'Near Me' feature.",
+          });
+        }
+      );
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Geolocation not supported",
+            description: "Your browser does not support geolocation.",
+        });
+    }
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
-        <Link href="#" className="flex items-center justify-center" prefetch={false}>
-          <LocateIcon className="h-6 w-6 text-primary" />
-          <span className="sr-only">LocaFind</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            prefetch={false}
-          >
-            Sign Up
-          </Link>
-        </nav>
-      </header>
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Discover Your Next Favorite Spot with LocaFind
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Our intelligent search helps you find the best local spots, from restaurants and cafes to parks and
-                    museums.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link
-                    href="/search"
-                    className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                    prefetch={false}
-                  >
-                    Start Exploring
-                  </Link>
-                </div>
-              </div>
-              <Image
-                src="/locafind-logo.png"
-                width="600"
-                height="400"
-                alt="Hero"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-                data-ai-hint="logo"
-              />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
+      <main className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
+        <div className="mb-8">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4 border-4 border-primary/20">
+              <LocateIcon className="h-12 w-12 text-primary" />
             </div>
-          </div>
-        </section>
+            <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+            LocaFind
+            </h1>
+        </div>
+        <p className="max-w-md mx-auto text-lg text-muted-foreground mb-8">
+          Discover the best local spots, from hidden gems to popular hangouts. Your next adventure is just a search away.
+        </p>
+
+        <form onSubmit={handleSearch} className="w-full max-w-md">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    type="text"
+                    placeholder="Search for 'hotels', 'parks', etc."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full h-14 pl-10 pr-4 py-2 text-lg bg-secondary/50 border-2 border-border rounded-full focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                />
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-4">
+                <Button type="submit" size="lg" className="rounded-full w-full">
+                    <Search className="mr-2 h-5 w-5" />
+                    Search
+                </Button>
+                <Button type="button" variant="outline" size="lg" className="rounded-full w-full" onClick={handleNearMe}>
+                    <MapPin className="mr-2 h-5 w-5" />
+                    Near Me
+                </Button>
+            </div>
+        </form>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 LocaFind. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Terms of Service
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Privacy
-          </Link>
-        </nav>
+
+      <footer className="absolute bottom-6 text-xs text-muted-foreground">
+        &copy; 2024 LocaFind. All rights reserved.
       </footer>
     </div>
   );

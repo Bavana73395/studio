@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams, useRouter } from 'next/navigation'
 import { searchLocations } from "@/ai/flows/location-search";
 import { generateDetailedDescription } from "@/ai/flows/detailed-description";
 import { imageToText } from "@/ai/flows/image-to-text";
@@ -31,6 +32,8 @@ import { List, MapIcon } from "lucide-react";
 
 export default function SearchPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams()
+  const router = useRouter();
 
   const [userLocation, setUserLocation] = React.useState<{ latitude: number; longitude: number } | null>(null);
   const [useRatingFilter, setUseRatingFilter] = React.useState(false);
@@ -60,10 +63,21 @@ export default function SearchPage() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
+          const loc = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-          });
+          };
+          setUserLocation(loc);
+          
+          const initialQuery = searchParams.get('q');
+          const nearMe = searchParams.get('near_me');
+
+          if(initialQuery) {
+            handleSearch(initialQuery, loc);
+          } else if (nearMe) {
+            handleSearch("places near me", loc);
+          }
+
         },
         () => {
           toast({
@@ -71,10 +85,11 @@ export default function SearchPage() {
             title: "Location access denied",
             description: "Please enable location access for better results.",
           });
+           router.push('/');
         }
       );
     }
-  }, [toast]);
+  }, [toast, searchParams, router]);
   
   const updateSearchHistory = (query: string) => {
     const newHistory = [query, ...searchHistory.filter(item => item !== query)].slice(0, 5);
@@ -82,14 +97,13 @@ export default function SearchPage() {
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
   };
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, location?: {latitude: number, longitude: number} | null) => {
     if (!query.trim()) return;
     
     setIsSearching(true);
     setSearchResults(null);
     setSelectedLocation(null);
     setDetailedDescription(null);
-    setIsResultsSheetOpen(true);
     
     updateSearchHistory(query);
     
@@ -97,15 +111,42 @@ export default function SearchPage() {
     if (useRatingFilter) {
       finalQuery += " with a rating of 4 stars or higher";
     }
+    
+    const locationToUse = location || userLocation;
+
+    if (!locationToUse) {
+       toast({
+        variant: "destructive",
+        title: "Location not available",
+        description: "Could not determine your location. Please enable location services.",
+      });
+      setIsSearching(false);
+      return;
+    }
+
+    // Open the results sheet only if it's not from the initial page load search
+    if(!searchParams.get('q') && !searchParams.get('near_me')){
+        setIsResultsSheetOpen(true);
+    }
+
 
     try {
       const result = await searchLocations({
         query: finalQuery,
-        userLocation: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : undefined,
+        userLocation: locationToUse ? `${locationToUse.latitude},${locationToUse.longitude}` : undefined,
         language: navigator.language,
       });
 
       setSearchResults(result.locations ?? []);
+      if(result.locations && result.locations.length > 0) {
+        setIsResultsSheetOpen(true);
+      } else {
+        toast({
+            title: "No results found",
+            description: "Try a different search query."
+        })
+      }
+
     } catch (error: any) {
       console.error("Search failed:", error);
       let description = "Could not fetch locations. Please try again.";
@@ -120,6 +161,8 @@ export default function SearchPage() {
       setSearchResults([]);
     } finally {
       setIsSearching(false);
+      // Clear the query params from URL after initial search
+      router.replace('/search', undefined);
     }
   };
   
@@ -270,7 +313,7 @@ export default function SearchPage() {
                         Show Results
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="bottom">
+                  <SheetContent side="bottom" className="dark">
                     <SheetHeader>
                       <SheetTitle>Search Results</SheetTitle>
                        <SheetDescription>
@@ -289,12 +332,10 @@ export default function SearchPage() {
         )}
 
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogContent className="sm:max-w-[625px]">
+          <DialogContent className="sm:max-w-[625px] dark">
             <DialogHeader>
               <DialogTitle>
-                <span className="sr-only">
                   {selectedLocation ? selectedLocation.name : "Location Details"}
-                </span>
               </DialogTitle>
               <DialogDescription className="sr-only">
                   Details for {selectedLocation?.name}.
