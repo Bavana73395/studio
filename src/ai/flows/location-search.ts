@@ -53,7 +53,7 @@ const foursquareTool = ai.defineTool(
     inputSchema: z.object({
       query: z.string(),
       ll: z.string().optional(),
-      radius: z.number().optional().describe('Radius in meters to search within. This is a hard requirement.'),
+      radius: z.number().describe('Radius in meters to search within. This is a hard requirement.'),
       fields: z.string().optional().describe('Fields to include in the response, comma-separated (e.g., "fsq_id,name,rating,hours,website").')
     }),
     outputSchema: z.any(),
@@ -113,4 +113,5 @@ const searchLocationsFlow = ai.defineFlow(
     return output!;
   }
 );
+
 
