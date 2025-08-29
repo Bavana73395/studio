@@ -11,6 +11,7 @@ interface FoursquareSearchParams {
   ll?: string;
   limit?: number;
   radius?: number;
+  fields?: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export async function searchFoursquare(params: FoursquareSearchParams) {
     limit: (params.limit || 20).toString(),
     ...params.ll && {ll: params.ll},
     ...params.radius && {radius: params.radius.toString()},
+    ...params.fields && {fields: params.fields},
   });
 
   try {
@@ -54,6 +56,9 @@ export async function searchFoursquare(params: FoursquareSearchParams) {
         imageUrl: `https://placehold.co/600x400.png`,
         lat: place.geocodes.main.latitude,
         lng: place.geocodes.main.longitude,
+        rating: place.rating,
+        hours: place.hours?.display,
+        website: place.website
     }));
 
     return { locations };

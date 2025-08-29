@@ -177,29 +177,42 @@ export default function SearchPage() {
     if (!userLocation) return "";
 
     const { latitude, longitude } = userLocation;
-    
-    // Always include user's location marker
-    let markers = `|${latitude},${longitude}`; 
-    let minLat = latitude, maxLat = latitude, minLon = longitude, maxLon = longitude;
+    let markers = ``;
+    let boundingBoxCoords: number[][] = [[longitude, latitude], [longitude, latitude]];
 
     const hasSearchResults = searchResults && searchResults.length > 0;
 
     if (hasSearchResults) {
-      searchResults.forEach(loc => {
-        if (loc.lat && loc.lng) {
-          markers += `|${loc.lat},${loc.lng}`;
-          minLat = Math.min(minLat, loc.lat);
-          maxLat = Math.max(maxLat, loc.lat);
-          minLon = Math.min(minLon, loc.lng);
-          maxLon = Math.max(maxLon, loc.lng);
-        }
-      });
+        markers = searchResults
+            .map(loc => loc.lat && loc.lng ? `|${loc.lat},${loc.lng}` : "")
+            .join('');
+
+        searchResults.forEach(loc => {
+            if (loc.lat && loc.lng) {
+                boundingBoxCoords[0][0] = Math.min(boundingBoxCoords[0][0], loc.lng);
+                boundingBoxCoords[0][1] = Math.min(boundingBoxCoords[0][1], loc.lat);
+                boundingBoxCoords[1][0] = Math.max(boundingBoxCoords[1][0], loc.lng);
+                boundingBoxCoords[1][1] = Math.max(boundingBoxCoords[1][1], loc.lat);
+            }
+        });
+    } else {
+      markers = `|${latitude},${longitude}`;
     }
+    
+    // Add user location to bounding box calculation
+    boundingBoxCoords[0][0] = Math.min(boundingBoxCoords[0][0], longitude);
+    boundingBoxCoords[0][1] = Math.min(boundingBoxCoords[0][1], latitude);
+    boundingBoxCoords[1][0] = Math.max(boundingBoxCoords[1][0], longitude);
+    boundingBoxCoords[1][1] = Math.max(boundingBoxCoords[1][1], latitude);
+
 
     const url = `https://www.openstreetmap.org/export/embed.html?layer=mapnik&marker=${latitude},${longitude}${markers}`;
     
     // If there are search results, calculate a bounding box to fit all markers
     if (hasSearchResults) {
+        const [minLon, minLat] = boundingBoxCoords[0];
+        const [maxLon, maxLat] = boundingBoxCoords[1];
+
       // Add a small buffer to the bounding box
       const latBuffer = (maxLat - minLat) * 0.1 || 0.01;
       const lonBuffer = (maxLon - minLon) * 0.1 || 0.01;
@@ -279,7 +292,9 @@ export default function SearchPage() {
           <DialogContent className="sm:max-w-[625px]">
             <DialogHeader>
               <DialogTitle>
-                {selectedLocation ? selectedLocation.name : "Location Details"}
+                <span className="sr-only">
+                  {selectedLocation ? selectedLocation.name : "Location Details"}
+                </span>
               </DialogTitle>
               <DialogDescription className="sr-only">
                   Details for {selectedLocation?.name}.

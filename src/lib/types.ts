@@ -7,4 +7,7 @@ export interface LocationSearchResult {
   imageUrl: string;
   lat?: number;
   lng?: number;
+  rating?: number;
+  hours?: string;
+  website?: string;
 }

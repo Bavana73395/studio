@@ -5,7 +5,7 @@ import type { LocationSearchResult } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, Navigation, Globe, Star, Clock } from "lucide-react";
 import { LocationIcon } from "./location-icon";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +35,7 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
     );
   }
 
-  const handleGetDirections = () => {
+  const handleViewOnMap = () => {
     if (location) {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(location.address)}`;
       window.open(url, '_blank');
@@ -61,9 +61,31 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
                 <h2 className="text-2xl font-bold text-white shadow-lg font-headline">{location.name}</h2>
                 <p className="text-sm text-white/90 shadow-sm capitalize">{location.category}</p>
             </div>
+             {location.rating && (
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm text-foreground py-1 px-2 rounded-full text-sm font-medium">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span>{(location.rating / 2).toFixed(1)}</span>
+                </div>
+            )}
         </div>
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-4 mb-4">
+        <div className="p-4 space-y-4">
+             <div className="grid grid-cols-2 gap-4 text-sm">
+                {location.hours && (
+                    <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span className={location.hours.toLowerCase() === 'open' ? 'text-green-600' : 'text-red-600'}>{location.hours}</span>
+                    </div>
+                )}
+                 {location.website && (
+                    <div className="flex items-center gap-2 truncate">
+                       <Globe className="w-4 h-4 text-muted-foreground" />
+                       <a href={location.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">
+                           {location.website.replace(/^(https?:\/\/)?(www\.)?/, '')}
+                        </a>
+                    </div>
+                )}
+            </div>
+          <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <MapPin className="h-5 w-5 mt-1 text-muted-foreground shrink-0" />
               <div>
@@ -71,9 +93,9 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
                 <p className="text-muted-foreground">{location.address}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleGetDirections} className="shrink-0">
+            <Button variant="outline" size="sm" onClick={handleViewOnMap} className="shrink-0">
               <Navigation className="mr-2 h-4 w-4" />
-              Directions
+              View on Map
             </Button>
           </div>
           <h3 className="font-semibold text-lg mb-2">AI-Generated Details</h3>

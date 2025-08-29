@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LocationIcon } from "./location-icon";
 import Image from 'next/image';
+import { Star } from "lucide-react";
 
 interface ResultCardProps {
   location: LocationSearchResult;
@@ -18,7 +19,7 @@ export function ResultCard({ location, onSelect, isSelected }: ResultCardProps) 
     <Card
       onClick={onSelect}
       className={cn(
-        "p-3 flex items-center space-x-4 cursor-pointer transition-all duration-200 border-2",
+        "p-3 flex items-start space-x-4 cursor-pointer transition-all duration-200 border-2",
         "hover:shadow-md hover:border-primary",
         isSelected ? "bg-primary/10 border-primary" : "bg-card border-transparent"
       )}
@@ -32,6 +33,19 @@ export function ResultCard({ location, onSelect, isSelected }: ResultCardProps) 
             {location.name}
         </h3>
         <p className="text-sm text-muted-foreground capitalize truncate">{location.address}</p>
+        <div className="flex items-center gap-4 mt-1 text-xs">
+            {location.rating && (
+                <div className="flex items-center gap-1 text-muted-foreground">
+                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                    <span className="font-medium">{(location.rating / 2).toFixed(1)}</span>
+                </div>
+            )}
+             {location.hours && (
+                <span className={cn("font-semibold", location.hours.toLowerCase() === 'open' ? 'text-green-600' : 'text-red-600')}>
+                    {location.hours}
+                </span>
+            )}
+        </div>
       </div>
     </Card>
   );
