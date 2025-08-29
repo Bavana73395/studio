@@ -1,17 +1,23 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LocateIcon, Search, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LandingPage() {
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +47,30 @@ export default function LandingPage() {
             description: "Your browser does not support geolocation.",
         });
     }
+  }
+
+  if (!isClient) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
+            <main className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
+                 <div className="mb-8">
+                    <Skeleton className="h-24 w-24 rounded-full mb-4" />
+                    <Skeleton className="h-16 w-80" />
+                </div>
+                <Skeleton className="h-6 w-96 mb-8" />
+                <div className="w-full max-w-md space-y-4">
+                    <Skeleton className="h-14 w-full rounded-full" />
+                     <div className="flex items-center justify-center gap-4">
+                        <Skeleton className="h-12 w-full rounded-full" />
+                        <Skeleton className="h-12 w-full rounded-full" />
+                    </div>
+                </div>
+            </main>
+             <footer className="absolute bottom-6">
+                <Skeleton className="h-4 w-48" />
+            </footer>
+        </div>
+    );
   }
 
   return (
