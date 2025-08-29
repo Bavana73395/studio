@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LocateIcon, Search, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LandingPage() {
   const [isClient, setIsClient] = useState(false);
@@ -51,24 +50,19 @@ export default function LandingPage() {
 
   if (!isClient) {
     return (
-        <div className="relative flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 overflow-hidden">
+        <div className="relative flex flex-col items-center justify-center min-h-screen bg-transparent text-foreground p-4 overflow-hidden">
             <main className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-2xl">
-                 <div className="mb-8">
-                    <Skeleton className="h-24 w-24 rounded-full mb-4" />
-                    <Skeleton className="h-16 w-80" />
+                <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4 border-4 border-primary/20">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/50 opacity-75"></span>
+                    <LocateIcon className="relative inline-flex h-12 w-12 text-primary" />
                 </div>
-                <Skeleton className="h-6 w-96 mb-8" />
-                <div className="w-full max-w-md space-y-4">
-                    <Skeleton className="h-14 w-full rounded-full" />
-                     <div className="flex items-center justify-center gap-4">
-                        <Skeleton className="h-12 w-full rounded-full" />
-                        <Skeleton className="h-12 w-full rounded-full" />
-                    </div>
-                </div>
+                <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                    LocaFind
+                </h1>
+                <p className="max-w-md mx-auto text-lg text-muted-foreground mt-4">
+                  Loading your next adventure...
+                </p>
             </main>
-             <footer className="absolute bottom-6 z-10">
-                <Skeleton className="h-4 w-48" />
-            </footer>
         </div>
     );
   }
