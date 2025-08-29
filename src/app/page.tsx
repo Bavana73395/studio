@@ -51,8 +51,8 @@ export default function LandingPage() {
 
   if (!isClient) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
-            <main className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
+        <div className="relative flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 overflow-hidden">
+            <main className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-2xl">
                  <div className="mb-8">
                     <Skeleton className="h-24 w-24 rounded-full mb-4" />
                     <Skeleton className="h-16 w-80" />
@@ -66,7 +66,7 @@ export default function LandingPage() {
                     </div>
                 </div>
             </main>
-             <footer className="absolute bottom-6">
+             <footer className="absolute bottom-6 z-10">
                 <Skeleton className="h-4 w-48" />
             </footer>
         </div>
@@ -74,8 +74,8 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
-      <main className="flex flex-col items-center justify-center text-center w-full max-w-2xl">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-transparent text-foreground p-4 overflow-hidden">
+      <main className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-2xl">
         <div className="mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4 border-4 border-primary/20">
               <LocateIcon className="h-12 w-12 text-primary" />
@@ -112,7 +112,7 @@ export default function LandingPage() {
         </form>
       </main>
 
-      <footer className="absolute bottom-6 text-xs text-muted-foreground">
+      <footer className="absolute bottom-6 z-10 text-xs text-muted-foreground">
         &copy; 2024 LocaFind. All rights reserved.
       </footer>
     </div>
