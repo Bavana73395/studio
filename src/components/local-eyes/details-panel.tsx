@@ -1,6 +1,6 @@
 
 "use client";
-
+import React from 'react';
 import type { LocationSearchResult } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +15,7 @@ interface DetailsPanelProps {
   isLoading: boolean;
 }
 
-export function DetailsPanel({ location, description, isLoading }: DetailsPanelProps) {
+export const DetailsPanel = React.memo(function DetailsPanel({ location, description, isLoading }: DetailsPanelProps) {
   if (isLoading || !location) {
     return (
       <div className="p-4 lg:p-6">
@@ -114,4 +114,4 @@ export function DetailsPanel({ location, description, isLoading }: DetailsPanelP
         </div>
     </div>
   );
-}
+});

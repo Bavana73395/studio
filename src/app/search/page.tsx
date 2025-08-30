@@ -51,53 +51,13 @@ export default function SearchPage() {
   const [isResultsSheetOpen, setIsResultsSheetOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    setIsClient(true);
-    if (typeof window !== 'undefined') {
-      const history = localStorage.getItem("searchHistory");
-      if (history) {
-        setSearchHistory(JSON.parse(history));
-      }
-    }
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const loc = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          setUserLocation(loc);
-          
-          const initialQuery = searchParams.get('q');
-          const nearMe = searchParams.get('near_me');
-
-          if(initialQuery) {
-            handleSearch(initialQuery, loc);
-          } else if (nearMe) {
-            handleSearch("places near me", loc);
-          }
-
-        },
-        () => {
-          toast({
-            variant: "destructive",
-            title: "Location access denied",
-            description: "Please enable location access for better results.",
-          });
-           router.push('/');
-        }
-      );
-    }
-  }, [toast, searchParams, router]);
-  
-  const updateSearchHistory = (query: string) => {
+  const updateSearchHistory = React.useCallback((query: string) => {
     const newHistory = [query, ...searchHistory.filter(item => item !== query)].slice(0, 5);
     setSearchHistory(newHistory);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
-  };
+  }, [searchHistory]);
 
-  const handleSearch = async (query: string, location?: {latitude: number, longitude: number} | null) => {
+  const handleSearch = React.useCallback(async (query: string, location?: {latitude: number, longitude: number} | null) => {
     if (!query.trim()) return;
     
     setIsSearching(true);
@@ -164,9 +124,49 @@ export default function SearchPage() {
       // Clear the query params from URL after initial search
       router.replace('/search', undefined);
     }
-  };
+  }, [userLocation, useRatingFilter, toast, router, updateSearchHistory, searchParams]);
   
-  const handleSelectLocation = async (location: LocationSearchResult) => {
+  React.useEffect(() => {
+    setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const history = localStorage.getItem("searchHistory");
+      if (history) {
+        setSearchHistory(JSON.parse(history));
+      }
+    }
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          setUserLocation(loc);
+          
+          const initialQuery = searchParams.get('q');
+          const nearMe = searchParams.get('near_me');
+
+          if(initialQuery) {
+            handleSearch(initialQuery, loc);
+          } else if (nearMe) {
+            handleSearch("places near me", loc);
+          }
+
+        },
+        () => {
+          toast({
+            variant: "destructive",
+            title: "Location access denied",
+            description: "Please enable location access for better results.",
+          });
+           router.push('/');
+        }
+      );
+    }
+  }, [toast, searchParams, router, handleSearch]);
+  
+  const handleSelectLocation = React.useCallback(async (location: LocationSearchResult) => {
     setSelectedLocation(location);
     setIsDetailsDialogOpen(true);
     setDetailedDescription(null);
@@ -190,9 +190,9 @@ export default function SearchPage() {
     } finally {
       setIsLoadingDetails(false);
     }
-  };
+  }, [toast]);
 
-  const handleImageSearch = (file: File) => {
+  const handleImageSearch = React.useCallback((file: File) => {
     setIsSearching(true);
     toast({ title: "Analyzing Image...", description: "Extracting text from the image." });
     const reader = new FileReader();
@@ -214,9 +214,9 @@ export default function SearchPage() {
       }
     };
     reader.readAsDataURL(file);
-  };
+  }, [handleSearch, toast]);
   
-  const generateMapUrl = () => {
+  const generateMapUrl = React.useCallback(() => {
     if (!userLocation) return "";
 
     const { latitude, longitude } = userLocation;
@@ -265,7 +265,7 @@ export default function SearchPage() {
     
     // If no results, just center on the user's location with a default zoom level
     return url;
-  };
+  }, [userLocation, searchResults]);
 
   if (!isClient) {
     return null;

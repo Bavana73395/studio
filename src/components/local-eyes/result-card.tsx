@@ -1,6 +1,6 @@
 
 "use client";
-
+import React from 'react';
 import type { LocationSearchResult } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ interface ResultCardProps {
   isSelected: boolean;
 }
 
-export function ResultCard({ location, onSelect, isSelected }: ResultCardProps) {
+export const ResultCard = React.memo(function ResultCard({ location, onSelect, isSelected }: ResultCardProps) {
   return (
     <Card
       onClick={onSelect}
@@ -49,4 +49,4 @@ export function ResultCard({ location, onSelect, isSelected }: ResultCardProps) 
       </div>
     </Card>
   );
-}
+});
