@@ -280,6 +280,7 @@ export default function SearchPage() {
               isSearching={isSearching}
               useRatingFilter={useRatingFilter}
               setUseRatingFilter={setUseRatingFilter}
+              searchHistory={searchHistory}
             />
         </div>
         

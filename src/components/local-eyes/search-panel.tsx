@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Mic, Search, Star, Camera } from "lucide-react";
+import { Mic, Search, Star, Camera, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SearchPanelProps {
   onSearch: (query: string) => void;
@@ -18,9 +19,10 @@ interface SearchPanelProps {
   isSearching: boolean;
   useRatingFilter: boolean;
   setUseRatingFilter: (value: boolean) => void;
+  searchHistory: string[];
 }
 
-export function SearchPanel({ onSearch, onImageSearch, isSearching, useRatingFilter, setUseRatingFilter }: SearchPanelProps) {
+export function SearchPanel({ onSearch, onImageSearch, isSearching, useRatingFilter, setUseRatingFilter, searchHistory }: SearchPanelProps) {
   const [query, setQuery] = React.useState("");
   const [isListening, setIsListening] = React.useState(false);
   const { toast } = useToast();
@@ -139,6 +141,35 @@ export function SearchPanel({ onSearch, onImageSearch, isSearching, useRatingFil
                     </div>
                 </PopoverContent>
             </Popover>
+            {searchHistory.length > 0 && (
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm">
+                            <History className="mr-2 h-4 w-4" />
+                            Recent
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Recent Searches</h4>
+                                <p className="text-sm text-muted-foreground">
+                                Click a past search to run it again.
+                                </p>
+                            </div>
+                            <ScrollArea className="h-40">
+                                <div className="flex flex-col gap-2 pr-4">
+                                {searchHistory.map((item, index) => (
+                                    <Button key={index} variant="ghost" className="justify-start" onClick={() => quickSearch(item)}>
+                                        {item}
+                                    </Button>
+                                ))}
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    </PopoverContent>
+                </Popover>
+            )}
         </div>
       </Card>
   );
